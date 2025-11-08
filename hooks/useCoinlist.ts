@@ -32,6 +32,17 @@ export function useCoinList({ search, tab }: UseCoinListParams) {
     fetchCoins();
   }, []);
 
+  const toggleFavorite = (coinId: string) => {
+    const newFavorites = new Set(favorites);
+    if (newFavorites.has(coinId)) {
+      newFavorites.delete(coinId);
+    } else {
+      newFavorites.add(coinId);
+    }
+    setFavorites(newFavorites);
+    localStorage.setItem("favorites", JSON.stringify([...newFavorites]));
+  };
+
   // 필터링된 코인 목록
   const filteredCoins = coins.filter((coin) => {
     // 검색 필터
@@ -55,5 +66,6 @@ export function useCoinList({ search, tab }: UseCoinListParams) {
     coins: filteredCoins,
     loading,
     favorites,
+    toggleFavorite,
   };
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Star } from "lucide-react";
 import { Coin } from "@/types/coin";
 import styles from "./index.module.css";
@@ -8,30 +7,15 @@ import { formatPrice } from "@/lib/formatPrice";
 
 type CoinTableProps = {
   coins: Coin[];
+  favorites: Set<string>;
+  onToggleFavorite: (coinId: string) => void;
 };
 
-export default function CoinTable({ coins }: CoinTableProps) {
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    const stored = localStorage.getItem("favorites");
-    if (stored) {
-      // eslint-disable-next-line
-      setFavorites(new Set(JSON.parse(stored)));
-    }
-  }, []);
-
-  const toggleFavorite = (coinId: string) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(coinId)) {
-      newFavorites.delete(coinId);
-    } else {
-      newFavorites.add(coinId);
-    }
-    setFavorites(newFavorites);
-    localStorage.setItem("favorites", JSON.stringify([...newFavorites]));
-  };
-
+export default function CoinTable({
+  coins,
+  favorites,
+  onToggleFavorite,
+}: CoinTableProps) {
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
@@ -51,7 +35,7 @@ export default function CoinTable({ coins }: CoinTableProps) {
                 <div className={styles.nameCell}>
                   <button
                     className={styles.favoriteBtn}
-                    onClick={() => toggleFavorite(coin.id)}
+                    onClick={() => onToggleFavorite(coin.id)}
                   >
                     <Star
                       size={16}

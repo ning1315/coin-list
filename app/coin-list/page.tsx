@@ -19,14 +19,25 @@ export default function CoinList() {
   const search = searchParams.get("search") || "";
   const activeTab = tab === "favorite" ? "favorite" : "all";
 
-  const { coins, loading } = useCoinList({ search, tab });
+  const { coins, loading, favorites, toggleFavorite } = useCoinList({
+    search,
+    tab,
+  });
 
   return (
     <div className={styles.pageContainer}>
       <h1>Coin List</h1>
       <Tab tabs={TABS} activeTab={activeTab} />
       <SearchInput placeholder="Search something...(BTC, Bitcoin, B...)" />
-      {loading ? <CoinTableSkeleton /> : <CoinTable coins={coins} />}
+      {loading ? (
+        <CoinTableSkeleton />
+      ) : (
+        <CoinTable
+          coins={coins}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+        />
+      )}
     </div>
   );
 }
