@@ -23,7 +23,7 @@ export default function SearchInput({ placeholder }: SearchInputProps) {
       } else {
         params.delete("search");
       }
-      router.push(`${pathname}?${params.toString()}`);
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }, 300);
 
     return () => clearTimeout(timer);

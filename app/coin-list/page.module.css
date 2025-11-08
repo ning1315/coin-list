@@ -18,11 +18,11 @@
   font-size: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
-  color: #666;
+  color: var(--gray-600);
   font-weight: 600;
 }
 
 .activeTabButton {
   font-weight: 600;
-  color: white;
+  color: var(--gray-100);
 }

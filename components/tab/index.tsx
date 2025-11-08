@@ -29,7 +29,7 @@ export default function Tab({
     } else {
       const params = new URLSearchParams(searchParams.toString());
       params.set(searchParamKey, value);
-      router.push(`${pathname}?${params.toString()}`);
+      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }
   };
 
