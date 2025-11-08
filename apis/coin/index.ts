@@ -3,7 +3,7 @@ import { Coin } from "@/apis/coin/type";
 export async function getCoins(): Promise<Coin[]> {
   try {
     const res = await fetch(
-      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=100",
+      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd",
       { next: { revalidate: 60 } }
     );
 

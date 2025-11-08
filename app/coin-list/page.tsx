@@ -19,16 +19,17 @@ export default function CoinList() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") || "all";
   const search = searchParams.get("search") || "";
-  const sort = searchParams.get("sort") as SortField | null;
-  const order = searchParams.get("order") as "asc" | "desc" | null;
+  const sort =
+    (searchParams.get("sort") as SortField | null) || "current_price";
+  const order = (searchParams.get("order") as "asc" | "desc" | null) || "desc";
   const activeTab = tab === "favorite" ? "favorite" : "all";
 
   const { showToast } = useToast();
   const { coins, loading, favorites, toggleFavorite } = useCoinList({
     search,
     tab,
-    sort: sort || undefined,
-    order: order || "desc",
+    sort,
+    order,
   });
 
   const handleToggleFavorite = (coinId: string) => {
