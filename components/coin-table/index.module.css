@@ -1,6 +1,7 @@
 .tableWrapper {
-  overflow-x: auto;
+  overflow: auto;
   margin-top: 20px;
+  height: 600px;
 }
 
 .table {
@@ -75,6 +76,7 @@
 .coinName {
   font-size: 12px;
   color: var(--gray-600);
+  min-width: 300px;
 }
 
 .priceUsd {

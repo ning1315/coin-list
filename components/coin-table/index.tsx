@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { Star, ArrowUpDown } from "lucide-react";
 import { Coin, SortField } from "@/apis/coin/type";
 import { formatPrice } from "@/lib/formatPrice";
@@ -18,6 +20,14 @@ export default function CoinTable({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: coins.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 70,
+    overscan: 5,
+  });
 
   const handleSort = (field: SortField) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -33,8 +43,10 @@ export default function CoinTable({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
+  const items = virtualizer.getVirtualItems();
+
   return (
-    <div className={styles.tableWrapper}>
+    <div ref={parentRef} className={styles.tableWrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
@@ -74,55 +86,66 @@ export default function CoinTable({
           </tr>
         </thead>
         <tbody>
-          {coins.map((coin) => (
-            <tr key={coin.id}>
-              <td>
-                <div className={styles.nameCell}>
-                  <button
-                    className={styles.favoriteBtn}
-                    onClick={() => onToggleFavorite(coin.id)}
-                  >
-                    <Star
-                      size={16}
-                      fill={favorites.has(coin.id) ? "#fbbf24" : "none"}
-                      color={favorites.has(coin.id) ? "#fbbf24" : "#666"}
+          <tr style={{ height: `${items[0]?.start ?? 0}px` }} />
+          {items.map((virtualRow) => {
+            const coin = coins[virtualRow.index];
+            return (
+              <tr key={coin.id} data-index={virtualRow.index}>
+                <td>
+                  <div className={styles.nameCell}>
+                    <button
+                      className={styles.favoriteBtn}
+                      onClick={() => onToggleFavorite(coin.id)}
+                    >
+                      <Star
+                        size={16}
+                        fill={favorites.has(coin.id) ? "#fbbf24" : "none"}
+                        color={favorites.has(coin.id) ? "#fbbf24" : "#666"}
+                      />
+                    </button>
+                    <img
+                      src={coin.image}
+                      alt={coin.name}
+                      className={styles.coinIcon}
                     />
-                  </button>
-                  <img
-                    src={coin.image}
-                    alt={coin.name}
-                    className={styles.coinIcon}
-                  />
-                  <div>
-                    <div className={styles.coinSymbol}>
-                      {coin.symbol.toUpperCase()}
+                    <div>
+                      <div className={styles.coinSymbol}>
+                        {coin.symbol.toUpperCase()}
+                      </div>
+                      <div className={styles.coinName}>{coin.name}</div>
                     </div>
-                    <div className={styles.coinName}>{coin.name}</div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <div>{coin.current_price.toLocaleString()}</div>
-                <div className={styles.priceUsd}>
-                  ${coin.current_price.toLocaleString()}
-                </div>
-              </td>
-              <td>
-                <span
-                  className={
-                    coin.price_change_percentage_24h >= 0
-                      ? styles.positive
-                      : styles.negative
-                  }
-                >
-                  {coin.price_change_percentage_24h >= 0 ? "+" : ""}
-                  {coin.price_change_percentage_24h.toFixed(2)}%
-                </span>
-              </td>
-              <td>{formatPrice(coin.total_volume)}</td>
-              <td>{formatPrice(coin.market_cap)}</td>
-            </tr>
-          ))}
+                </td>
+                <td>
+                  <div>{coin.current_price.toLocaleString()}</div>
+                  <div className={styles.priceUsd}>
+                    ${coin.current_price.toLocaleString()}
+                  </div>
+                </td>
+                <td>
+                  <span
+                    className={
+                      coin.price_change_percentage_24h >= 0
+                        ? styles.positive
+                        : styles.negative
+                    }
+                  >
+                    {coin.price_change_percentage_24h >= 0 ? "+" : ""}
+                    {coin.price_change_percentage_24h.toFixed(2)}%
+                  </span>
+                </td>
+                <td>{formatPrice(coin.total_volume)}</td>
+                <td>{formatPrice(coin.market_cap)}</td>
+              </tr>
+            );
+          })}
+          <tr
+            style={{
+              height: `${
+                virtualizer.getTotalSize() - (items[items.length - 1]?.end ?? 0)
+              }px`,
+            }}
+          />
         </tbody>
       </table>
     </div>
