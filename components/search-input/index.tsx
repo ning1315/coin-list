@@ -17,17 +17,21 @@ export default function SearchInput({ placeholder }: SearchInputProps) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set("search", value);
-      } else {
-        params.delete("search");
+      const params = new URLSearchParams(window.location.search);
+      const currentSearch = params.get("search") || "";
+
+      if (value !== currentSearch) {
+        if (value) {
+          params.set("search", value);
+        } else {
+          params.delete("search");
+        }
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
       }
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [value, pathname, router, searchParams]);
+  }, [value, pathname, router]);
 
   return (
     <div className={styles.searchContainer}>
