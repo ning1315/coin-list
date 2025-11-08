@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Star, ArrowUpDown } from "lucide-react";
-import { Coin, SortField } from "@/api/coin/type";
+import { Coin, SortField } from "@/apis/coin/type";
 import { formatPrice } from "@/lib/formatPrice";
 import styles from "./index.module.css";
 

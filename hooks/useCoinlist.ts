@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Coin, SortField } from "@/api/coin/type";
-import { getCoins } from "@/api/coin";
+import { Coin, SortField } from "@/apis/coin/type";
+import { getCoins } from "@/apis/coin";
 
 type UseCoinListParams = {
   search?: string;
@@ -41,13 +41,18 @@ export function useCoinList({
 
   const toggleFavorite = (coinId: string) => {
     const newFavorites = new Set(favorites);
-    if (newFavorites.has(coinId)) {
-      newFavorites.delete(coinId);
-    } else {
+    const isAdding = !newFavorites.has(coinId);
+
+    if (isAdding) {
       newFavorites.add(coinId);
+    } else {
+      newFavorites.delete(coinId);
     }
+
     setFavorites(newFavorites);
     localStorage.setItem("favorites", JSON.stringify([...newFavorites]));
+
+    return isAdding;
   };
 
   // 필터링된 코인 목록
