@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
-import { Coin } from "@/types/coin";
-import { getCoins } from "@/lib/api";
+import { Coin, SortField } from "@/api/coin/type";
+import { getCoins } from "@/api/coin";
 
 type UseCoinListParams = {
   search?: string;
   tab?: string;
+  sort?: SortField;
+  order?: "asc" | "desc";
 };
 
-export function useCoinList({ search, tab }: UseCoinListParams) {
+export function useCoinList({
+  search,
+  tab,
+  sort,
+  order = "desc",
+}: UseCoinListParams) {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -44,7 +51,7 @@ export function useCoinList({ search, tab }: UseCoinListParams) {
   };
 
   // 필터링된 코인 목록
-  const filteredCoins = coins.filter((coin) => {
+  let filteredCoins = coins.filter((coin) => {
     // 검색 필터
     if (search) {
       const query = search.toLowerCase();
@@ -61,6 +68,15 @@ export function useCoinList({ search, tab }: UseCoinListParams) {
 
     return true;
   });
+
+  // 정렬
+  if (sort) {
+    filteredCoins = [...filteredCoins].sort((a, b) => {
+      const aValue = a[sort];
+      const bValue = b[sort];
+      return order === "asc" ? aValue - bValue : bValue - aValue;
+    });
+  }
 
   return {
     coins: filteredCoins,

@@ -1,31 +1,76 @@
 "use client";
 
-import { Star } from "lucide-react";
-import { Coin } from "@/types/coin";
-import styles from "./index.module.css";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Star, ArrowUpDown } from "lucide-react";
+import { Coin, SortField } from "@/api/coin/type";
 import { formatPrice } from "@/lib/formatPrice";
-
-type CoinTableProps = {
-  coins: Coin[];
-  favorites: Set<string>;
-  onToggleFavorite: (coinId: string) => void;
-};
+import styles from "./index.module.css";
 
 export default function CoinTable({
   coins,
   favorites,
   onToggleFavorite,
-}: CoinTableProps) {
+}: {
+  coins: Coin[];
+  favorites: Set<string>;
+  onToggleFavorite: (coinId: string) => void;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleSort = (field: SortField) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const currentSort = params.get("sort");
+    const currentOrder = params.get("order");
+
+    if (currentSort === field) {
+      params.set("order", currentOrder === "asc" ? "desc" : "asc");
+    } else {
+      params.set("sort", field);
+      params.set("order", "desc");
+    }
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
             <th>Name</th>
-            <th>Price</th>
-            <th>24h Change</th>
-            <th>24h Volume</th>
-            <th>Market Cap</th>
+            <th
+              onClick={() => handleSort("current_price")}
+              className={styles.sortable}
+            >
+              <div>
+                Price <ArrowUpDown size={14} />
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort("price_change_percentage_24h")}
+              className={styles.sortable}
+            >
+              <div>
+                24h Change <ArrowUpDown size={14} />
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort("total_volume")}
+              className={styles.sortable}
+            >
+              <div>
+                24h Volume <ArrowUpDown size={14} />
+              </div>
+            </th>
+            <th
+              onClick={() => handleSort("market_cap")}
+              className={styles.sortable}
+            >
+              <div>
+                Market Cap <ArrowUpDown size={14} />
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>

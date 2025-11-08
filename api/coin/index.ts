@@ -1,4 +1,4 @@
-import { Coin } from "@/types/coin";
+import { Coin } from "@/api/coin/type";
 
 export async function getCoins(): Promise<Coin[]> {
   try {

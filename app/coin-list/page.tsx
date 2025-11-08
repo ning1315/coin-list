@@ -5,7 +5,8 @@ import Tab from "@/components/tab";
 import SearchInput from "@/components/search-input";
 import CoinTable from "@/components/coin-table";
 import CoinTableSkeleton from "@/components/coin-table/skeleton";
-import { useCoinList } from "@/hooks/useCoinlist";
+import { useCoinList } from "@/hooks/useCoinList";
+import { SortField } from "@/api/coin/type";
 import styles from "./page.module.css";
 
 const TABS = [
@@ -17,11 +18,15 @@ export default function CoinList() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") || "all";
   const search = searchParams.get("search") || "";
+  const sort = searchParams.get("sort") as SortField | null;
+  const order = searchParams.get("order") as "asc" | "desc" | null;
   const activeTab = tab === "favorite" ? "favorite" : "all";
 
   const { coins, loading, favorites, toggleFavorite } = useCoinList({
     search,
     tab,
+    sort: sort || undefined,
+    order: order || "desc",
   });
 
   return (

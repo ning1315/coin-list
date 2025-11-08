@@ -1,4 +1,4 @@
-import styles from "./skeleton.module.css";
+import styles from "./index.module.css";
 
 export default function CoinTableSkeleton() {
   return (
