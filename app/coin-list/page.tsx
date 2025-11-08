@@ -16,30 +16,8 @@ const TABS = [
 ];
 
 export default function CoinList() {
-  const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") || "all";
-  const search = searchParams.get("search") || "";
-  const sort =
-    (searchParams.get("sort") as SortField | null) || "current_price";
-  const order = (searchParams.get("order") as "asc" | "desc" | null) || "desc";
-  const activeTab = tab === "favorite" ? "favorite" : "all";
-
-  const { showToast } = useToast();
-  const { coins, loading, favorites, toggleFavorite } = useCoinList({
-    search,
-    tab,
-    sort,
-    order,
-  });
-
-  const handleToggleFavorite = (coinId: string) => {
-    const isAdding = toggleFavorite(coinId);
-    showToast(
-      isAdding
-        ? { message: "Successfully added!", type: "success" }
-        : { message: "Successfully deleted!", type: "error" }
-    );
-  };
+  const { coins, loading, favorites, toggleFavorite, activeTab } =
+    useCoinList();
 
   return (
     <div className={styles.pageContainer}>
@@ -52,7 +30,7 @@ export default function CoinList() {
         <CoinTable
           coins={coins}
           favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
+          onToggleFavorite={toggleFavorite}
         />
       )}
     </div>

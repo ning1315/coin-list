@@ -1,20 +1,19 @@
 import { useState, useEffect } from "react";
 import { Coin, SortField } from "@/apis/coin/type";
 import { getCoins } from "@/apis/coin";
+import { useSearchParams } from "next/navigation";
+import { useToast } from "@/contexts/ToastContext";
 
-type UseCoinListParams = {
-  search?: string;
-  tab?: string;
-  sort?: SortField;
-  order?: "asc" | "desc";
-};
+export function useCoinList() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab") || "all";
+  const search = searchParams.get("search") || "";
+  const sort =
+    (searchParams.get("sort") as SortField | null) || "current_price";
+  const order = (searchParams.get("order") as "asc" | "desc" | null) || "desc";
+  const activeTab = tab === "favorite" ? "favorite" : "all";
+  const { showToast } = useToast();
 
-export function useCoinList({
-  search,
-  tab,
-  sort,
-  order = "desc",
-}: UseCoinListParams) {
   const [coins, setCoins] = useState<Coin[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -23,7 +22,6 @@ export function useCoinList({
   useEffect(() => {
     const stored = localStorage.getItem("favorites");
     if (stored) {
-      // eslint-disable-next-line
       setFavorites(new Set(JSON.parse(stored)));
     }
   }, []);
@@ -31,10 +29,16 @@ export function useCoinList({
   // 코인 데이터 로드
   useEffect(() => {
     const fetchCoins = async () => {
-      setLoading(true);
       const data = await getCoins();
-      setCoins(data);
-      setLoading(false);
+      if (data.length > 0) {
+        setCoins(data);
+        setLoading(false);
+      } else {
+        showToast({
+          message: "코인 데이터를 불러오는데 실패했습니다.",
+          type: "error",
+        });
+      }
     };
     fetchCoins();
   }, []);
@@ -48,6 +52,12 @@ export function useCoinList({
     } else {
       newFavorites.delete(coinId);
     }
+
+    showToast(
+      isAdding
+        ? { message: "Successfully added!", type: "success" }
+        : { message: "Successfully deleted!", type: "error" }
+    );
 
     setFavorites(newFavorites);
     localStorage.setItem("favorites", JSON.stringify([...newFavorites]));
@@ -88,5 +98,6 @@ export function useCoinList({
     loading,
     favorites,
     toggleFavorite,
+    activeTab,
   };
 }
